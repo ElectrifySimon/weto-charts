@@ -359,6 +359,20 @@ function figKey(fig) {
   const rest = s.split(".")[1] || "0";
   return [chap, parseFloat(rest) || 0];
 }
+function renderOne(ch) {
+    if (ch.type === "stacked_bar") stackedBar({ id: ch.second ? ch.id + "-a" : ch.id }, null, ch);
+    else if (ch.type === "stacked_bar_line") stackWithLine({ id: ch.id }, ch);
+    else if (ch.type === "combo") combo({ id: ch.id }, ch);
+    else if (ch.type === "line") lineChart({ id: ch.id }, ch);
+    else if (ch.type === "hbar") hbar({ id: ch.id }, ch);
+    else if (ch.type === "donut") donut({ id: ch.id }, ch);
+    else if (ch.type === "scatter") scatter({ id: ch.id }, ch);
+    else if (ch.type === "grouped_scenarios") {
+      groupedBar({ id: ch.id + "-a" }, Object.assign({}, ch, { unit: "TW", categories: ch.categories }));
+      groupedBar({ id: ch.id + "-b" }, { categories: ch.categories, series: ch.second.series, unit: "PWh" });
+    }
+    else groupedBar({ id: ch.id }, ch);
+}
 function draw() {
   CHARTS.forEach(c => { try { c.dispose(); } catch (e) {} });
   CHARTS = [];
@@ -402,20 +416,6 @@ function draw() {
   }
   /* render synchronously: headless browsers throttle requestAnimationFrame */
   LIST.forEach(renderOne);
-  function renderOne(ch) {
-      if (ch.type === "stacked_bar") stackedBar({ id: ch.second ? ch.id + "-a" : ch.id }, null, ch);
-      else if (ch.type === "stacked_bar_line") stackWithLine({ id: ch.id }, ch);
-      else if (ch.type === "combo") combo({ id: ch.id }, ch);
-      else if (ch.type === "line") lineChart({ id: ch.id }, ch);
-      else if (ch.type === "hbar") hbar({ id: ch.id }, ch);
-      else if (ch.type === "donut") donut({ id: ch.id }, ch);
-      else if (ch.type === "scatter") scatter({ id: ch.id }, ch);
-      else if (ch.type === "grouped_scenarios") {
-        groupedBar({ id: ch.id + "-a" }, Object.assign({}, ch, { unit: "TW", categories: ch.categories }));
-        groupedBar({ id: ch.id + "-b" }, { categories: ch.categories, series: ch.second.series, unit: "PWh" });
-      }
-      else groupedBar({ id: ch.id }, ch);
-  }
   setTimeout(resize, 60);
 }
 function reveal() {
