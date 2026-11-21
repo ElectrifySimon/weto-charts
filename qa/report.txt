@@ -4,30 +4,30 @@ PASS  1.3
 PASS  1.4       
 PASS  1.5       
 PASS  1.6       
-FAIL  1.7        8 values not printed, e.g. [9.3, 12.3, 15.3, 25.1, 14]
+FAIL  1.7        9 values not printed, e.g. [9.3, 12.3, 15.3, 25.1, 14]
 PASS  1.8       
 FAIL  1.9        9 values not printed, e.g. [1, 11.5, 39.7, 150.3, 27.9]
 FAIL  1.10       10 values not printed, e.g. [37.8, 37.1, 34.7, 28.2, 31]
 PASS  2.2       
-FAIL  3.4        22 values not printed, e.g. [1.2, 3.5, -42.5, 1, 35]
+FAIL  3.4        27 values not printed, e.g. [1.2, 3.5, 0.5, -42.5, 1]
 FAIL  3.9        20 values not printed, e.g. [-12500, -4500, -2400, -1200, -400]
 PASS  3.10      
 PASS  3.8       
-FAIL  3.11       19 values not printed, e.g. [15.3, 30, 51.2, 53.2, 84.4]
+FAIL  3.11       18 values not printed, e.g. [15.3, 30, 51.2, 53.2, 84.4]
 FAIL  3.13       20 values not printed, e.g. [3.7, 11.4, 25.2, 15.5, 29.8]
 PASS  3.17      
 FAIL  3.18       label not printed: 'Energy sufficiency'; label not printed: 'HH energy affordability'; label not printed: 'HH energy inflation pressure'
 FAIL  3.12       1 values not printed, e.g. [21.5]
 FAIL  3.14       label not printed: 'Oceania'
-FAIL  3.16       14 values not printed, e.g. [25.9, 4.6, 7, 3.5, 7.3]
-PASS  3.16b     
+FAIL  3.16       21 values not printed, e.g. [25.9, 8.9, 11.6, 10.8, 20.3]
+FAIL  3.16b      7 values not printed, e.g. [10.6, 11.5, 12.2, 13.4, 13.2]
 FAIL  3.6        14 values not printed, e.g. [100, 98.4, 92.3, 87.6, 83.7]
 PASS  3.2       
 PASS  3.5       
 PASS  3.7       
 PASS  1.11      
-FAIL  1.12       5 values not printed, e.g. [65, 88, 115, 163, 214]
-PASS  3.1       
+FAIL  1.12       4 values not printed, e.g. [65, 88, 163, 214]
+FAIL  3.1        1 values not printed, e.g. [-0.15]
 PASS  3.1b      
 FAIL  2.1        label not printed: 'Central America/Caribbean'; label not printed: 'East Asia & Pacific'
 PASS  2.1       
@@ -44,4 +44,4 @@ PASS  2.3
 PASS  2.3b      
 PASS  2.3c      
 
-31 of 45 cards passed
+29 of 45 cards passed

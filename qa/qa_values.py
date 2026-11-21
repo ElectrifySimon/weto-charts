@@ -44,6 +44,10 @@ def main() -> int:
         return 2
     charts = json.load(open(sys.argv[1]))["charts"]
     spans = json.load(open(sys.argv[2]))
+    tol_rel, tol_abs = 0.01, 0.05          # fixed by the acceptance rule
+    if "--tol" in sys.argv:
+        tol_rel = float(sys.argv[sys.argv.index("--tol") + 1])
+    allow_skips = "--allow-skips" in sys.argv
     only = None
     if "--figs" in sys.argv:
         only = set(sys.argv[sys.argv.index("--figs") + 1:])
@@ -55,7 +59,10 @@ def main() -> int:
             continue
         src = spans.get(fig) or spans.get(fig.rstrip("bc"))
         if not src:
-            print("SKIP  no spans for figure", fig)
+            print("FAIL  %-10s no printed spans for this figure" % fig)
+            checked += 1
+            if not allow_skips:
+                fails += 1
             continue
         checked += 1
         sp = src["spans"]
@@ -79,10 +86,14 @@ def main() -> int:
                 vals += [v for v in (s.get("values") or []) if v is not None]
             for p in c.get("points") or []:
                 vals += [p.get("x"), p.get("y")]
-            missing = [v for v in vals
-                       if round(float(v), 2) not in nums
-                       and round(float(v), 1) not in nums
-                       and round(float(v)) not in nums]
+            def printed(v):
+                v = float(v)
+                for cand in nums:
+                    if abs(cand - v) <= max(tol_abs, abs(v) * tol_rel):
+                        return True
+                return False
+
+            missing = [v for v in vals if not printed(v)]
             if missing:
                 problems.append("%d values not printed, e.g. %s" % (len(missing), missing[:5]))
 
