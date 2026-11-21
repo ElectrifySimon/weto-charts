@@ -138,7 +138,7 @@ h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650}
 </div>
 
 <script src="vendor/echarts.min.js"></script>
-<script src="data3.js?v=1"></script>
+<script src="data3.js?v=2"></script>
 <script>
 const D = window.WETO;
 const $ = s => document.querySelector(s);
@@ -328,6 +328,22 @@ function donut(c, opt) {
     }]
   });
 }
+function scatter(c, opt) {
+  return mk(c.id, {
+    tooltip: { trigger: "item", backgroundColor: cssv("--surface"), borderColor: cssv("--line"),
+      textStyle: { color: cssv("--ink"), fontSize: 12 },
+      formatter: p => p.name + "\n" + opt.xUnit + ": " + p.value[0] + "\n" + opt.yUnit + ": " + p.value[1] },
+    grid: { left: 8, right: 30, top: 30, bottom: 22, containLabel: true },
+    xAxis: Object.assign({ type: "value", name: opt.xUnit, min: opt.xMin, max: opt.xMax,
+      nameTextStyle: { color: cssv("--muted"), fontSize: 10 } }, axT()),
+    yAxis: Object.assign({ type: "value", name: opt.yUnit, min: opt.yMin, max: opt.yMax,
+      nameTextStyle: { color: cssv("--muted"), fontSize: 10 } }, axT()),
+    series: [{ type: "scatter", symbolSize: 9, itemStyle: { color: "#1476a7" },
+      data: (opt.points || []).map(p => ({ value: [p.x, p.y], name: p.name })),
+      label: { show: true, position: "right", distance: 6, color: cssv("--muted"), fontSize: 10,
+        formatter: p => p.name } }]
+  });
+}
 /* ---------- build ---------- */
 const CHAP = { "1": "Chapter 1 · Energy system", "2": "Chapter 2 · Regions", "3": "Chapter 3 · Socio-economic outcomes" };
 function figKey(fig) {
@@ -384,6 +400,7 @@ function draw() {
       else if (ch.type === "line") lineChart({ id: ch.id }, ch);
       else if (ch.type === "hbar") hbar({ id: ch.id }, ch);
       else if (ch.type === "donut") donut({ id: ch.id }, ch);
+      else if (ch.type === "scatter") scatter({ id: ch.id }, ch);
       else if (ch.type === "grouped_scenarios") {
         groupedBar({ id: ch.id + "-a" }, Object.assign({}, ch, { unit: "TW", categories: ch.categories }));
         groupedBar({ id: ch.id + "-b" }, { categories: ch.categories, series: ch.second.series, unit: "PWh" });
