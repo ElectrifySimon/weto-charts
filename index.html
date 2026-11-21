@@ -431,11 +431,16 @@ function reveal() {
     c.dataset.played = "1";
     const ch = D.charts.find(x => x.id === c.dataset.cid);
     if (!ch || !window.echarts) return;
-    c.querySelectorAll(".plot").forEach(d => {
-      const inst = echarts.getInstanceByDom(d);
-      if (inst) inst.dispose();
-    });
-    renderOne(ch);
+    try {
+      c.querySelectorAll(".plot").forEach(d => {
+        const inst = echarts.getInstanceByDom(d);
+        if (inst) inst.dispose();
+      });
+      renderOne(ch);
+    } catch (err) {
+      (window.__animErr = window.__animErr || []).push(c.dataset.cid + ": " + err.message);
+      renderOne(ch);
+    }
   };
   let first = true;
   const tick = () => {
