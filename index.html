@@ -70,6 +70,9 @@ h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650}
 .card p{margin:3px 0 10px;font-size:12px;color:var(--muted)}
 .card .plot{width:100%;height:300px}
 .card.wide{grid-column:1/-1}
+.sect{grid-column:1/-1;margin:22px 0 2px;font-size:12px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+.sect:first-child{margin-top:4px;border-top:0;padding-top:0}
 .card.wide .plot{height:400px}
 .card .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .card .duo .plot{height:330px}
@@ -128,6 +131,7 @@ h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650}
 
 <script src="vendor/echarts.min.js"></script>
 <script src="data.js"></script>
+<script src="data2.js"></script>
 <script>
 const D = window.WETO;
 const $ = s => document.querySelector(s);
@@ -275,18 +279,40 @@ function lineChart(c, opt) {
   });
 }
 
+function hbar(c, opt) {
+  return mk(c.id, {
+    tooltip: tip(),
+    legend: legend({ data: opt.series.map(s => s.name) }),
+    grid: { left: 8, right: 26, top: 42, bottom: 8, containLabel: true },
+    xAxis: Object.assign({ type: "value", name: opt.unit, nameTextStyle: { color: cssv("--muted"), fontSize: 10 } }, axT()),
+    yAxis: Object.assign({ type: "category", data: opt.categories, inverse: true,
+      axisLabel: { color: cssv("--muted"), fontSize: 10 } }, axT(), { splitLine: { show: false } }),
+    series: opt.series.map(s => ({
+      name: s.name, type: "bar", data: s.values, barMaxWidth: 13,
+      itemStyle: { color: s.color, borderRadius: [0, 3, 3, 0] },
+      labelLayout: { hideOverlap: true },
+      label: { show: true, position: "right", color: cssv("--muted"), fontSize: 9,
+        formatter: p => p.value == null ? "" : (Math.abs(p.value) >= 100 ? Math.round(p.value) : p.value) }
+    }))
+  });
+}
 /* ---------- build ---------- */
+const CHAP = { "1": "Chapter 1 · Energy system", "2": "Chapter 2 · Regions", "3": "Chapter 3 · Socio-economic outcomes" };
 function draw() {
   CHARTS.forEach(c => { try { c.dispose(); } catch (e) {} });
   CHARTS = [];
   const host = $("#charts");
   if (!host.dataset.built) {
     host.dataset.built = "1";
+    let lastChap = null;
     host.innerHTML = D.charts.map(ch => {
+      const chap = String(ch.fig || "").split(".")[0];
+      const head = chap !== lastChap ? `<h2 class="sect" id="ch${chap}">${CHAP[chap] || ""}</h2>` : "";
+      lastChap = chap;
       const duo = ch.second
         ? `<div class="duo"><div class="plot" id="${ch.id}-a"></div><div class="plot" id="${ch.id}-b"></div></div>`
         : `<div class="plot" id="${ch.id}"></div>`;
-      return `<article class="card${ch.wide ? " wide" : ""}">
+      return head + `<article class="card${ch.wide ? " wide" : ""}">
         <h3><span class="fig">Figure ${ch.fig}</span>${ch.title}</h3>
         <p>${ch.sub}</p>
         ${duo}
@@ -302,6 +328,7 @@ function draw() {
       else if (ch.type === "stacked_bar_line") stackWithLine({ id: ch.id }, ch);
       else if (ch.type === "combo") combo({ id: ch.id }, ch);
       else if (ch.type === "line") lineChart({ id: ch.id }, ch);
+      else if (ch.type === "hbar") hbar({ id: ch.id }, ch);
       else if (ch.type === "grouped_scenarios") {
         groupedBar({ id: ch.id + "-a" }, Object.assign({}, ch, { unit: "TW", categories: ch.categories }));
         groupedBar({ id: ch.id + "-b" }, { categories: ch.categories, series: ch.second.series, unit: "PWh" });
