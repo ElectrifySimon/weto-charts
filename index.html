@@ -131,7 +131,7 @@ h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650}
 
 <script src="vendor/echarts.min.js"></script>
 <script src="data.js"></script>
-<script src="data2.js?v=6"></script>
+<script src="data2.js?v=7"></script>
 <script>
 const D = window.WETO;
 const $ = s => document.querySelector(s);
@@ -296,6 +296,25 @@ function hbar(c, opt) {
     }))
   });
 }
+function donut(c, opt) {
+  const s = opt.series[0];
+  return mk(c.id, {
+    tooltip: { trigger: "item", backgroundColor: cssv("--surface"), borderColor: cssv("--line"),
+      textStyle: { color: cssv("--ink"), fontSize: 12 },
+      formatter: p => p.name + ": " + p.value + " " + opt.unit + " (" + p.percent + "%)" },
+    legend: legend({ bottom: 0, top: "auto" }),
+    graphic: [
+      { type: "text", left: "center", top: "38%", style: { text: opt.center_value, fill: cssv("--ink"), fontSize: 22, fontWeight: 600, textAlign: "center" } },
+      { type: "text", left: "center", top: "47%", style: { text: opt.center_label, fill: cssv("--muted"), fontSize: 10, textAlign: "center" } }
+    ],
+    series: [{ type: "pie", radius: ["44%", "66%"], center: ["50%", "42%"], avoidLabelOverlap: true,
+      itemStyle: { borderColor: cssv("--surface"), borderWidth: 2 },
+      label: { color: cssv("--muted"), fontSize: 10, formatter: "{b}\\n{c}" },
+      labelLine: { lineStyle: { color: cssv("--line") } },
+      data: s.values.map((v, i) => ({ value: v, name: opt.categories[i], itemStyle: { color: s.colors ? s.colors[i] : undefined } }))
+    }]
+  });
+}
 /* ---------- build ---------- */
 const CHAP = { "1": "Chapter 1 · Energy system", "2": "Chapter 2 · Regions", "3": "Chapter 3 · Socio-economic outcomes" };
 function draw() {
@@ -329,6 +348,7 @@ function draw() {
       else if (ch.type === "combo") combo({ id: ch.id }, ch);
       else if (ch.type === "line") lineChart({ id: ch.id }, ch);
       else if (ch.type === "hbar") hbar({ id: ch.id }, ch);
+      else if (ch.type === "donut") donut({ id: ch.id }, ch);
       else if (ch.type === "grouped_scenarios") {
         groupedBar({ id: ch.id + "-a" }, Object.assign({}, ch, { unit: "TW", categories: ch.categories }));
         groupedBar({ id: ch.id + "-b" }, { categories: ch.categories, series: ch.second.series, unit: "PWh" });
