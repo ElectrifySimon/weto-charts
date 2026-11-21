@@ -1,25 +1,41 @@
-# WETO 2026, ten charts rebuilt
+# WETO 2026 charts, rebuilt as an interactive page
 
-A test page that takes the first ten figures of IRENA's *World Energy Transition Outlook 2026: 1.5°C Pathway* (October 2026) and re-draws them in Apache ECharts, using the layout and design tokens of the DashDist shell.
+The figures of IRENA's *World Energy Transition Outlook 2026: 1.5°C Pathway* (October 2026), redrawn in Apache ECharts on the design tokens of the DashDist shell. Charts only, in report order and chapter by chapter.
 
 Live: https://electrifysimon.github.io/weto-charts/
 
 ## What is here
 
-- `index.html` - the page. Hero, four headline numbers, ten chart cards, method notes.
-- `data.js` - every series as plain numbers, one object per figure, each with the method used.
+- `index.html` - the page. Hero, four headline numbers, a chapter nav, and 44 chart cards sorted into report order.
+- `data.js` - figures 1.1 to 1.10.
+- `data2.js` - everything after that, including the ten tiles of figure 2.1 and the three panels of 2.3.
 - `vendor/echarts.min.js` - Apache ECharts 6.1.0 (Apache-2.0), copied from DashDist.
 - `vendor/fonts/` - Figtree webfonts (SIL OFL).
 
 ## Where the numbers come from
 
-The report's figures are vector drawings. Both the printed labels and the drawing geometry live in the PDF, so the data was read from the PDF layer rather than estimated by eye:
+Every figure in the report is a vector drawing. Both the printed labels and the geometry live in the PDF, so nothing here is measured by eye:
 
-- printed data labels and column totals come from the text layer;
+- printed labels and column totals come from the text layer, and they win wherever they exist;
 - bar heights and line markers come from the vector layer, mapped through the printed axis ticks;
-- inside a stacked bar, segments are scaled so each column matches the printed total.
+- inside a stacked bar, segments are scaled so the column matches its printed total;
+- multi-panel figures get one axis fit per panel, since each panel carries its own scale.
 
-Each card on the page states which of these produced its numbers. Two limits are called out on the page: the technology split inside Figure 1.7 is not digitised, and the 1.5°C 2050 hydrogen bar in Figure 1.9 could not be recovered.
+Each card states which of those produced its numbers. Where a read is uncertain, the card says so.
+
+## Coverage
+
+31 figures and 44 cards, across chapters 1 to 3.
+
+Figure 2.1 is drawn the way the report draws it: nine regional tiles with 2025, 2035 and 2050 stacked by technology, Global last, plus a donut of cumulative investment. The nine regional investment figures sum to 41.7 USD trillion, which is the printed Global.
+
+Known limits, printed on the cards that carry them:
+
+- 2023 transport bars in figure 2.3 sit under 1 percent, so only four of eight regions register.
+- Three 2050 readings in figure 2.3 land above the last printed tick. They are measured, not printed.
+- The nine 2050 regional totals sum to 36,869 GW against a printed global 38,232 GW, because the global tile also covers regions not drawn.
+
+Not rebuilt: figures 2.4, 2.5, 3.3, 3.15 and 3.19 to 3.21. They are infographics or diagrams with no data series to extract.
 
 ## Source
 
@@ -37,19 +53,4 @@ python3 -m http.server 8765
 # http://localhost:8765/
 ```
 
-## Coverage as of the last build
-
-30 charts rebuilt across figures 1.1 to 3.18. Every card states the method used:
-printed data labels, vector geometry with a stated axis residual, or a printed total.
-
-Not rebuilt, with the reason:
-
-- **2.1** regional treemap. No axis to fit; the labels sit inside nested tiles and
-  overlap, so neither the axis gate nor the label pairing can be satisfied.
-- **2.3** sectoral electrification. Three panels share one caption and the per-panel
-  tick column fails the 2 percent axis-fit gate, so no panel has a trustworthy scale.
-
-Infographics (2.5, 3.15, 3.19, 3.20, 3.21) are out of scope: they carry no data series.
-
-The extraction process, its gates and its self-test live in the
-`chart-data-digitisation` skill (`references/geometry-process.md`).
+The extraction process, its gates and its self-test live in the `chart-data-digitisation` skill (`references/geometry-process.md`).
