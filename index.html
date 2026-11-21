@@ -446,8 +446,13 @@ function reveal() {
     });
     first = false;
   };
-  let raf = 0;
-  const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); };
+  let last = 0;
+  const onScroll = () => {
+    const now = Date.now();
+    if (now - last < 120) return;      // light throttle; rAF is throttled in headless tabs
+    last = now;
+    tick();
+  };
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", onScroll);
   tick();
