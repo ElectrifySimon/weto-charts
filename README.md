@@ -36,3 +36,14 @@ Figures are IRENA's. This rebuild is unofficial and exists to test chart renderi
 python3 -m http.server 8765
 # http://localhost:8765/
 ```
+
+## Coverage as of the last build
+
+- 27 charts are rebuilt: 1.1 to 1.11, 2.2, 3.2, 3.4 to 3.18.
+- 4 charts are not rebuilt, all multi-panel or treemap figures where the PDF draws the
+  panels as one undifferentiated object: 1.12, 2.1, 2.3, 3.1. They need a manual read.
+- Infographic figures are out of scope by request.
+
+Each card states how its numbers were obtained: vector geometry (bar heights and
+tick arithmetic off the PDF), printed data labels, or a read of the rendered chart
+image where no vector path was usable.
