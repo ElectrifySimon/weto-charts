@@ -39,11 +39,17 @@ python3 -m http.server 8765
 
 ## Coverage as of the last build
 
-- 27 charts are rebuilt: 1.1 to 1.11, 2.2, 3.2, 3.4 to 3.18.
-- 4 charts are not rebuilt, all multi-panel or treemap figures where the PDF draws the
-  panels as one undifferentiated object: 1.12, 2.1, 2.3, 3.1. They need a manual read.
-- Infographic figures are out of scope by request.
+30 charts rebuilt across figures 1.1 to 3.18. Every card states the method used:
+printed data labels, vector geometry with a stated axis residual, or a printed total.
 
-Each card states how its numbers were obtained: vector geometry (bar heights and
-tick arithmetic off the PDF), printed data labels, or a read of the rendered chart
-image where no vector path was usable.
+Not rebuilt, with the reason:
+
+- **2.1** regional treemap. No axis to fit; the labels sit inside nested tiles and
+  overlap, so neither the axis gate nor the label pairing can be satisfied.
+- **2.3** sectoral electrification. Three panels share one caption and the per-panel
+  tick column fails the 2 percent axis-fit gate, so no panel has a trustworthy scale.
+
+Infographics (2.5, 3.15, 3.19, 3.20, 3.21) are out of scope: they carry no data series.
+
+The extraction process, its gates and its self-test live in the
+`chart-data-digitisation` skill (`references/geometry-process.md`).
