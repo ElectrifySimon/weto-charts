@@ -177,7 +177,7 @@ function mk(id, opt) {
   return c;
 }
 function legend(extra) {
-  return Object.assign({ top: 0, left: 0, itemWidth: 10, itemHeight: 10, itemGap: 14,
+  return Object.assign({ top: 0, left: 0, itemWidth: 12, itemHeight: 8, itemGap: 13,
     textStyle: { color: cssv("--muted"), fontSize: 11 } }, extra || {});
 }
 
@@ -225,7 +225,8 @@ function stackWithLine(c, opt) {
     name: opt.line.name, type: "line", yAxisIndex: 1, data: opt.line.values,
     itemStyle: { color: opt.line.color }, lineStyle: { width: 2, color: opt.line.color },
     symbol: "circle", symbolSize: 7, smooth: false,
-    label: { show: true, position: "top", color: opt.line.color, fontSize: 10, formatter: "{c}" }
+    label: { show: true, position: "top", distance: 7, color: opt.line.color, fontSize: 10,
+             backgroundColor: cssv("--surface"), borderRadius: 3, padding: [2, 4], formatter: "{c}" }
   });
   return mk(c.id, {
     tooltip: tip(),

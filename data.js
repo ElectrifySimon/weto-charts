@@ -147,7 +147,7 @@ window.WETO = {
         { name: "DES", values: [null, 27.9, 112.9, 458.2], color: "#6bbcab" },
         { name: "1.5°C", values: [null, 27.9, 135.6, null], color: "#1476a7" }
       ],
-      note: "The 1.5°C 2050 bar could not be recovered from the vector layer. The 2025 value follows the report text: around 1 Mt.",
+      note: "The 2025 value is a single Mt on a 0-500 axis, so that bar has no visible height. The 1.5°C 2050 bar could not be recovered from the vector layer.",
       method: "Bars read from the vector layer on the printed 0-500 Mt axis."
     },
     {
