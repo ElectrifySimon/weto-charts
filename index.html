@@ -331,14 +331,14 @@ function draw() {
   CHARTS.forEach(c => { try { c.dispose(); } catch (e) {} });
   CHARTS = [];
   const host = $("#charts");
+  // report order: chapter, then figure number, then insertion order for sub-cards
+  const LIST = D.charts
+    .map((ch, i) => ({ ch, i, k: figKey(ch.fig) }))
+    .sort((a, b) => (a.k[0] - b.k[0]) || (a.k[1] - b.k[1]) || (a.i - b.i))
+    .map(x => x.ch);
   if (!host.dataset.built) {
     host.dataset.built = "1";
     let lastChap = null;
-    // report order: chapter, then figure number, then insertion order for sub-cards
-    const LIST = D.charts
-      .map((ch, i) => ({ ch, i, k: figKey(ch.fig) }))
-      .sort((a, b) => (a.k[0] - b.k[0]) || (a.k[1] - b.k[1]) || (a.i - b.i))
-      .map(x => x.ch);
     const chapters = [...new Set(LIST.map(ch => String(ch.fig || "").split(".")[0]))];
     const nav = document.createElement("nav");
     nav.className = "chapnav";
