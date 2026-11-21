@@ -784,7 +784,7 @@
     }
    ],
    "method": "printed data labels, one per bar; each label assigned to its nearest region tick",
-   "yMax": 80,
+   "yMax": 70,
    "note": "Four bars per region, read from the labels printed above each bar."
   },
   {
