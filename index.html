@@ -64,7 +64,10 @@ h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650}
 
 .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:14px;margin:4px 0 8px}
 .card{background:var(--surface);background-image:linear-gradient(180deg,var(--hi),transparent 60%);
-  border-radius:12px;padding:16px 16px 10px;box-shadow:var(--e2)}
+  border-radius:12px;padding:16px 16px 10px;box-shadow:var(--e2);
+  opacity:0;transform:translateY(12px);transition:opacity .55s cubic-bezier(.2,.7,.2,1),transform .55s cubic-bezier(.2,.7,.2,1)}
+.card.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.card{opacity:1;transform:none;transition:none}}
 .card .eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
   color:var(--muted);margin:0 0 6px;font-variant-numeric:tabular-nums}
 .card h3{margin:0;font-size:15px;font-weight:600;letter-spacing:-.1px;line-height:1.3}
@@ -164,8 +167,10 @@ function baseOpt() {
   return {
     backgroundColor: "transparent",
     textStyle: { fontFamily: "Figtree,system-ui,-apple-system,'Segoe UI',sans-serif", color: cssv("--muted") },
-    animationDuration: 650,
+    animation: true,
+    animationDuration: 820,
     animationEasing: "cubicOut",
+    animationDelay: idx => Math.min(idx * 28, 340),
     grid: { left: 8, right: 18, top: 42, bottom: 8, containLabel: true }
   };
 }
@@ -384,7 +389,7 @@ function draw() {
       const duo = ch.second
         ? `${lg}<div class="duo"><div class="plot" id="${ch.id}-a"></div><div class="plot" id="${ch.id}-b"></div></div>`
         : `${lg}<div class="plot" id="${ch.id}"></div>`;
-      return head + `<article class="card${ch.wide ? " wide" : ""}">
+      return head + `<article class="card${ch.wide ? " wide" : ""}" data-cid="${ch.id}">
         <div class="eyebrow">Figure ${ch.fig}</div>
         <h3>${ch.title}</h3>
         <p class="sub">${ch.sub}</p>
@@ -396,8 +401,8 @@ function draw() {
     }).join("");
   }
   /* render synchronously: headless browsers throttle requestAnimationFrame */
-  (() => {
-    LIST.forEach(ch => {
+  LIST.forEach(renderOne);
+  function renderOne(ch) {
       if (ch.type === "stacked_bar") stackedBar({ id: ch.second ? ch.id + "-a" : ch.id }, null, ch);
       else if (ch.type === "stacked_bar_line") stackWithLine({ id: ch.id }, ch);
       else if (ch.type === "combo") combo({ id: ch.id }, ch);
@@ -410,13 +415,41 @@ function draw() {
         groupedBar({ id: ch.id + "-b" }, { categories: ch.categories, series: ch.second.series, unit: "PWh" });
       }
       else groupedBar({ id: ch.id }, ch);
+  }
+  setTimeout(resize, 60);
+}
+function reveal() {
+  const cards = [...document.querySelectorAll(".card")];
+  const show = c => c.classList.add("in");
+  if (!("IntersectionObserver" in window)) { cards.forEach(show); return; }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const card = e.target;
+      show(card);
+      if (!card.dataset.played) {
+        card.dataset.played = "1";
+        const id = card.dataset.cid;
+        const ch = D.charts.find(x => x.id === id);
+        if (ch && window.echarts) {
+          card.querySelectorAll(".plot").forEach(d => {
+            const inst = echarts.getInstanceByDom(d);
+            if (inst) inst.dispose();
+          });
+          renderOne(ch);
+        }
+      }
+      io.unobserve(card);
     });
-    setTimeout(resize, 60);
-  })();
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+  cards.forEach(c => io.observe(c));
+  // headless captures and reduced-motion users get the settled state
+  setTimeout(() => cards.forEach(show), 1500);
 }
 function resize() { CHARTS.forEach(c => { try { c.resize(); } catch (e) {} }); }
 window.addEventListener("resize", () => { clearTimeout(window._rt); window._rt = setTimeout(resize, 120); });
 draw();
+reveal();
 </script>
 </body>
 </html>
