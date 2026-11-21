@@ -84,6 +84,10 @@ h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650}
 .foot h2{font-size:12px;margin:0 0 8px;color:var(--ink)}
 .foot ul{margin:0 0 10px;padding-left:18px}
 .foot a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.chapnav { position: sticky; top: 0; z-index: 20; display: flex; gap: 18px; flex-wrap: wrap;
+  padding: 10px 0; margin: 0 0 8px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.chapnav a { font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: .02em; }
+.chapnav a:hover { color: var(--ink); }
 </style>
 </head>
 <body>
@@ -317,6 +321,12 @@ function donut(c, opt) {
 }
 /* ---------- build ---------- */
 const CHAP = { "1": "Chapter 1 · Energy system", "2": "Chapter 2 · Regions", "3": "Chapter 3 · Socio-economic outcomes" };
+function figKey(fig) {
+  const s = String(fig || "");
+  const chap = parseInt(s.split(".")[0], 10) || 0;
+  const rest = s.split(".")[1] || "0";
+  return [chap, parseFloat(rest) || 0];
+}
 function draw() {
   CHARTS.forEach(c => { try { c.dispose(); } catch (e) {} });
   CHARTS = [];
@@ -324,7 +334,17 @@ function draw() {
   if (!host.dataset.built) {
     host.dataset.built = "1";
     let lastChap = null;
-    host.innerHTML = D.charts.map(ch => {
+    // report order: chapter, then figure number, then insertion order for sub-cards
+    const LIST = D.charts
+      .map((ch, i) => ({ ch, i, k: figKey(ch.fig) }))
+      .sort((a, b) => (a.k[0] - b.k[0]) || (a.k[1] - b.k[1]) || (a.i - b.i))
+      .map(x => x.ch);
+    const chapters = [...new Set(LIST.map(ch => String(ch.fig || "").split(".")[0]))];
+    const nav = document.createElement("nav");
+    nav.className = "chapnav";
+    nav.innerHTML = chapters.map(c => `<a href="#ch${c}">${(CHAP[c] || ("Chapter " + c)).replace(/<[^>]+>/g, "")}</a>`).join("");
+    host.parentNode.insertBefore(nav, host);
+    host.innerHTML = LIST.map(ch => {
       const chap = String(ch.fig || "").split(".")[0];
       const head = chap !== lastChap ? `<h2 class="sect" id="ch${chap}">${CHAP[chap] || ""}</h2>` : "";
       lastChap = chap;
@@ -342,7 +362,7 @@ function draw() {
   }
   /* render synchronously: headless browsers throttle requestAnimationFrame */
   (() => {
-    D.charts.forEach(ch => {
+    LIST.forEach(ch => {
       if (ch.type === "stacked_bar") stackedBar({ id: ch.second ? ch.id + "-a" : ch.id }, null, ch);
       else if (ch.type === "stacked_bar_line") stackWithLine({ id: ch.id }, ch);
       else if (ch.type === "combo") combo({ id: ch.id }, ch);
