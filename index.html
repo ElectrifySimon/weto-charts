@@ -130,7 +130,7 @@ h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650}
       <li><a id="lnk-landing" href="#">Report landing page</a></li>
       <li><a id="lnk-pdf" href="#">Full PDF (24 MB)</a></li>
       <li><a href="data3.js">Chart data as JavaScript</a></li>
-      <li>Engine: Apache ECharts</li>
+      <li>Charts: <span id="ncharts">45</span> &middot; Engine: Apache ECharts</li>
     </ul>
     <p>Page built for review on <span id="built"></span>. Figures are IRENA's; this rebuild is unofficial.</p>
   </footer>
@@ -144,10 +144,11 @@ const $ = s => document.querySelector(s);
 const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const isDark = () => document.documentElement.dataset.theme === "dark";
 
-$("#ncharts").textContent = D.charts.length;
-$("#lnk-landing").href = D.meta.landing;
-$("#lnk-pdf").href = D.meta.pdf;
-$("#built").textContent = D.meta.built;
+const setTxt = (sel, v) => { const e = $(sel); if (e) e.textContent = v; };
+setTxt("#ncharts", D.charts.length);
+const lp = $("#lnk-landing"); if (lp) lp.href = D.meta.landing;
+const pdf = $("#lnk-pdf"); if (pdf) pdf.href = D.meta.pdf;
+setTxt("#built", D.meta.built);
 
 $("#themebtn").addEventListener("click", () => {
   const t = isDark() ? "light" : "dark";
