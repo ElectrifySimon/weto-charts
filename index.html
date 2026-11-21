@@ -138,8 +138,7 @@ h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650}
 </div>
 
 <script src="vendor/echarts.min.js"></script>
-<script src="data.js"></script>
-<script src="data2.js?v=12"></script>
+<script src="data3.js?v=1"></script>
 <script>
 const D = window.WETO;
 const $ = s => document.querySelector(s);
@@ -282,7 +281,8 @@ function lineChart(c, opt) {
     tooltip: tip(),
     legend: legend({ data: opt.series.map(s => s.name) }),
     xAxis: Object.assign({ type: "category", data: opt.categories, boundaryGap: false }, axT(), { splitLine: { show: false } }),
-    yAxis: Object.assign({ type: "value", name: opt.unit, max: 100, nameTextStyle: { color: cssv("--muted"), fontSize: 10 } }, axT()),
+    yAxis: Object.assign({ type: "value", name: opt.unit, max: opt.yMax || null,
+      nameTextStyle: { color: cssv("--muted"), fontSize: 10 } }, axT()),
     series: opt.series.map(s => ({
       name: s.name, type: "line", data: s.values, smooth: false,
       itemStyle: { color: s.color }, lineStyle: { width: 2.5, color: s.color },
