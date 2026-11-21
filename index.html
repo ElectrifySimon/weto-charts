@@ -420,31 +420,38 @@ function draw() {
 }
 function reveal() {
   const cards = [...document.querySelectorAll(".card")];
-  const show = c => c.classList.add("in");
-  if (!("IntersectionObserver" in window)) { cards.forEach(show); return; }
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      const card = e.target;
-      show(card);
-      if (!card.dataset.played) {
-        card.dataset.played = "1";
-        const id = card.dataset.cid;
-        const ch = D.charts.find(x => x.id === id);
-        if (ch && window.echarts) {
-          card.querySelectorAll(".plot").forEach(d => {
-            const inst = echarts.getInstanceByDom(d);
-            if (inst) inst.dispose();
-          });
-          renderOne(ch);
-        }
-      }
-      io.unobserve(card);
+  const inView = c => {
+    const r = c.getBoundingClientRect();
+    return r.top < (window.innerHeight || 800) * 0.92 && r.bottom > 0;
+  };
+  // the first pass leaves the charts drawn by draw() alone; later passes replay
+  // the build animation the first time a card is actually seen
+  const play = c => {
+    if (c.dataset.played) return;
+    c.dataset.played = "1";
+    const ch = D.charts.find(x => x.id === c.dataset.cid);
+    if (!ch || !window.echarts) return;
+    c.querySelectorAll(".plot").forEach(d => {
+      const inst = echarts.getInstanceByDom(d);
+      if (inst) inst.dispose();
     });
-  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
-  cards.forEach(c => io.observe(c));
-  // headless captures and reduced-motion users get the settled state
-  setTimeout(() => cards.forEach(show), 1500);
+    renderOne(ch);
+  };
+  let first = true;
+  const tick = () => {
+    cards.forEach(c => {
+      if (!inView(c)) return;
+      c.classList.add("in");
+      if (first) c.dataset.played = "1"; else play(c);
+    });
+    first = false;
+  };
+  let raf = 0;
+  const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+  tick();
+  setTimeout(() => cards.forEach(c => c.classList.add("in")), 1500);
 }
 function resize() { CHARTS.forEach(c => { try { c.resize(); } catch (e) {} }); }
 window.addEventListener("resize", () => { clearTimeout(window._rt); window._rt = setTimeout(resize, 120); });
