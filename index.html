@@ -179,6 +179,15 @@ function tip() {
 function mk(id, opt) {
   const el = document.getElementById(id);
   if (!el) return;
+  // a wrapping legend grows upward from the top edge and eats the plot, so reserve
+  // room for the rows it will actually take at this width
+  if (opt.legend && Array.isArray(opt.legend.data) && opt.legend.data.length && opt.legend.bottom == null) {
+    const w = el.clientWidth || 640;
+    const need = opt.legend.data.reduce((a, n) => a + String(n).length * 6.1 + 26, 0);
+    const rows = Math.max(1, Math.ceil(need / Math.max(240, w - 20)));
+    const top = 26 + rows * 17;
+    opt.grid = Object.assign({}, opt.grid || {}, { top: Math.max(top, (opt.grid || {}).top || 0) });
+  }
   const c = echarts.init(el, null, { renderer: "canvas" });
   c.setOption(Object.assign(baseOpt(), opt));
   CHARTS.push(c);
