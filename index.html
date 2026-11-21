@@ -139,7 +139,7 @@ h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650}
 
 <script src="vendor/echarts.min.js"></script>
 <script src="data.js"></script>
-<script src="data2.js?v=11"></script>
+<script src="data2.js?v=12"></script>
 <script>
 const D = window.WETO;
 const $ = s => document.querySelector(s);
@@ -220,7 +220,8 @@ function groupedBar(c, opt) {
     tooltip: tip(),
     legend: legend({ data: opt.series.map(s => s.name) }),
     xAxis: Object.assign({ type: "category", data: opt.categories }, axT(), { splitLine: { show: false } }),
-    yAxis: Object.assign({ type: "value", name: opt.unit, nameTextStyle: { color: cssv("--muted"), fontSize: 10 } }, axT()),
+    yAxis: Object.assign({ type: "value", name: opt.unit, max: opt.yMax || null,
+      nameTextStyle: { color: cssv("--muted"), fontSize: 10 } }, axT()),
     series: opt.series.map(s => ({
       name: s.name, type: "bar", data: s.values, barMaxWidth: 30,
       itemStyle: { color: s.color, borderRadius: [3, 3, 0, 0] },
